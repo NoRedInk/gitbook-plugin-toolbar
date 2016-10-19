@@ -11,18 +11,11 @@ require(['gitbook'], function(gitbook) {
         buttons.forEach(function(button) {
             gitbook.toolbar.createButton({
                 icon: button.icon || "fa fa-external-link",
-                label: button.label || "Link",
+                label: gitbook.renderInline("markdown", button.label || "Link"),
                 position: 'right',
                 onClick: function(e) {
                     e.preventDefault();
-                    var mapping = {
-                        "{{title}}": encodeURIComponent(document.title),
-                        "{{url}}": encodeURIComponent(location.href)
-                    };
-                    var re = RegExp(Object.keys(mapping).join("|"), "g");
-                    var url = button.url.replace(re, function(matched) {
-                        return mapping[matched];
-                    });
+                    var url = gitbook.renderInline("markdown", button.url);
                     if (button.target == "_self") {
                         window.location = url;
                     } else {
