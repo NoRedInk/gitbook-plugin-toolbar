@@ -5,18 +5,25 @@ require(['gitbook'], function(gitbook) {
 
         if (!opts || !opts.buttons) return;
 
+        var lang = gitbook.state.innerLanguage;
+        var langPath = lang ? encodeURIComponent(lang) + '/' : '';
         var buttons = opts.buttons.slice(0);
         buttons.reverse();
 
         buttons.forEach(function(button) {
+            var label = button.label || "Link";
+            if (lang && typeof label === 'object') {
+                label = label[lang];
+            }
             gitbook.toolbar.createButton({
                 icon: button.icon || "fa fa-external-link",
-                label: button.label || "Link",
+                label: label,
                 position: 'right',
                 onClick: function(e) {
                     e.preventDefault();
                     var mapping = {
                         "{{title}}": encodeURIComponent(document.title),
+                        "{{langPath}}": langPath,
                         "{{url}}": encodeURIComponent(location.href),
                         "{{path}}": gitbook.page.getState("page").filepath
                     };
