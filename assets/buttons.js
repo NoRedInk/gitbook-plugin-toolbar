@@ -2,20 +2,28 @@ require(['gitbook'], function(gitbook) {
 
     gitbook.events.bind('start', function(e, config) {
         var opts = config.toolbar;
-        
+
         if (!opts || !opts.buttons) return;
-        
+
         var buttons = opts.buttons.slice(0);
         buttons.reverse();
-        
+
         buttons.forEach(function(button) {
             gitbook.toolbar.createButton({
                 icon: button.icon || "fa fa-external-link",
-                label: gitbook.renderInline("markdown", button.label || "Link"),
+                label: button.label || "Link",
                 position: 'right',
                 onClick: function(e) {
                     e.preventDefault();
-                    var url = gitbook.renderInline("markdown", button.url);
+                    var mapping = {
+                        "{{title}}": encodeURIComponent(document.title),
+                        "{{url}}": encodeURIComponent(location.href),
+                        "{{path}}": gitbook.page.getState("page").filepath
+                    };
+                    var re = RegExp(Object.keys(mapping).join("|"), "g");
+                    var url = button.url.replace(re, function(matched) {
+                        return mapping[matched];
+                    });
                     if (button.target == "_self") {
                         window.location = url;
                     } else {
